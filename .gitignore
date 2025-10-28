@@ -3,6 +3,7 @@
 *build/
 .idea/
 .vs/
+cmake-build-debug/
 
 # Files
 CMakeUserPresets.json
