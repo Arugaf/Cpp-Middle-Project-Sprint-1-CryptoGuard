@@ -97,7 +97,8 @@ TEST(CryptoGuardCtx, Checksum2) {
 }
 
 TEST(CryptoGuardCtx, Integration) {
-    std::stringstream inputEncrypt("The quick brown fox jumps over the lazy dog");
+    std::string inputEncryptStr{"The quick brown fox jumps over the lazy dog"};
+    std::stringstream inputEncrypt(inputEncryptStr);
     std::string inputEncryptChecksum("d7a8fbb37d7809469ca9abcb082e4f8d5651e46d3cdb762d2d0bf37c9e592");
 
     CryptoGuard::CryptoGuardCtx ctx;
@@ -107,7 +108,7 @@ TEST(CryptoGuardCtx, Integration) {
     std::noskipws(expectedEncrypted);
     expectedEncrypted.write("\xB6\x96\xD5" "A'\0\xE1\x90\fL'\xE6\xFF\xAB\x17\x1C\xE8\x15x\xD5\xCC\xD8\x83H\xFD}\x9ERml:\x12\xB5\f\x9D\x1}\xD4\xB9<\xC1\xFF\xE2\xD6" "Fh\xE7" "b", 48);
 
-    std::stringstream inputEncryptCopy("The quick brown fox jumps over the lazy dog");
+    std::stringstream inputEncryptCopy(inputEncryptStr);
     std::stringstream outputEncrypt{};
     ctx.EncryptFile(inputEncryptCopy, outputEncrypt, "12345678");
     ASSERT_EQ(outputEncrypt.str(), expectedEncrypted.str());

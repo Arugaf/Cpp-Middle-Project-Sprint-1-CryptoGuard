@@ -2,66 +2,81 @@
 
 #include <gtest/gtest.h>
 
+#include <fstream>
+
 using namespace CryptoGuard;
 
 TEST(CmdOptionsCommand, Encrypt) {
     ProgramOptions options{};
-    char *argv[] = {"", "--command=encrypt", "--input=."};
-    options.Parse(3, argv);
+    constexpr static std::array argv = {"", "--command=encrypt", "--input=."};
+    options.Parse(3, argv.data());
 
     ASSERT_EQ(options.GetCommand(), ProgramOptions::COMMAND_TYPE::ENCRYPT);
 }
 
 TEST(CmdOptionsCommand, Decrypt) {
     ProgramOptions options{};
-    char *argv[] = {"", "--command=decrypt", "--input=."};
-    options.Parse(3, argv);
+    constexpr static std::array argv = {"", "--command=decrypt", "--input=."};
+    options.Parse(3, argv.data());
 
     ASSERT_EQ(options.GetCommand(), ProgramOptions::COMMAND_TYPE::DECRYPT);
 }
 
 TEST(CmdOptionsCommand, Checksum) {
     ProgramOptions options{};
-    char *argv[] = {"", "--command=checksum", "--input=."};
-    options.Parse(3, argv);
+    constexpr static std::array argv = {"", "--command=checksum", "--input=."};
+    options.Parse(3, argv.data());
 
     ASSERT_EQ(options.GetCommand(), ProgramOptions::COMMAND_TYPE::CHECKSUM);
 }
 
 TEST(CmdOptionsCommand, NonExistingCommand) {
     ProgramOptions options{};
-    char *argv[] = {"", "--command=something", "--input=."};
+    constexpr static std::array argv = {"", "--command=something", "--input=."};
 
-    ASSERT_THROW(options.Parse(3, argv), std::exception);
+    ASSERT_THROW(options.Parse(3, argv.data()), std::exception);
 }
 
 TEST(CmdOptionsCommand, NoCommand) {
     ProgramOptions options{};
-    char *argv[] = {"", "--input=."};
+    constexpr static std::array argv = {"", "--input=."};
 
-    ASSERT_THROW(options.Parse(2, argv), std::exception);
+    ASSERT_THROW(options.Parse(2, argv.data()), std::exception);
 }
 
-TEST(ProgramOptions, InputFileValue) {
-    ProgramOptions options{};
-    char *argv[] = {"", "--command=encrypt", "--input=file.txt"};
-    options.Parse(3, argv);
+class ArgsTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        file_.open(filename_);
+        file_.close();
+    }
 
-    ASSERT_EQ(options.GetInputFile(), std::string{"file.txt"});
+protected:
+    std::string filename_{"file.txt"};
+    std::ofstream file_;
+};
+
+TEST_F(ArgsTest, InputFileValue) {
+    ProgramOptions options{};
+    constexpr static std::array argv = {"", "--command=encrypt", "--input=file.txt"};
+    options.Parse(3, argv.data());
+
+    ASSERT_EQ(options.GetInputFile(), "file.txt");
 }
 
-TEST(ProgramOptions, OutputFileValue) {
+TEST_F(ArgsTest, OutputFileValue) {
     ProgramOptions options{};
-    char *argv[] = {"", "--command=encrypt", "--input=file.txt", "--output=output.txt"};
-    options.Parse(4, argv);
+    constexpr static std::array argv = {"", "--command=encrypt", "--input=file.txt", "--output=output.txt"};
+    options.Parse(4, argv.data());
 
-    ASSERT_EQ(options.GetOutputFile(), std::string{"output.txt"});
+    ASSERT_EQ(options.GetOutputFile(), "output.txt");
 }
 
-TEST(ProgramOptions, PasswordValue) {
+TEST_F(ArgsTest, PasswordValue) {
     ProgramOptions options{};
-    char *argv[] = {"", "--command=encrypt", "--input=file.txt", "--output=output.txt", "--password=12345678"};
-    options.Parse(5, argv);
+    constexpr static std::array argv = {"", "--command=encrypt", "--input=file.txt", "--output=output.txt",
+                                        "--password=12345678"};
+    options.Parse(5, argv.data());
 
-    ASSERT_EQ(options.GetPassword(), std::string{"12345678"});
+    ASSERT_EQ(options.GetPassword(), "12345678");
 }
