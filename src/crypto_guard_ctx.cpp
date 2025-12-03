@@ -151,7 +151,7 @@ void CryptoGuardCtx::Impl::ProcessFile(std::iostream &inStream, std::iostream &o
     while (!inStream.eof()) {
         inStream.read(reinterpret_cast<std::istream::char_type *>(inBuf.data()), CHUNK_SIZE);
 
-        if (inStream.bad()) {
+        if (inStream.fail() && !inStream.eof()) {
             throw std::runtime_error("Error while reading from file");
         }
 
