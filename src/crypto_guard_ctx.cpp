@@ -95,13 +95,22 @@ std::string CryptoGuardCtx::Impl::CalculateChecksum(std::iostream &inStream) con
         ThrowError("bad md process initialization", ERR_get_error());
     }
 
-    std::vector<unsigned char> inBuf{};
-    std::noskipws(inStream);
-    std::copy(std::istream_iterator<unsigned char>(inStream), std::istream_iterator<unsigned char>(),
-              std::back_inserter(inBuf));
+    std::vector<unsigned char> inBuf(CHUNK_SIZE);
+    std::vector<unsigned char> outBuf(CHUNK_SIZE + EVP_MAX_BLOCK_LENGTH);
+    int outLen{};
 
-    if (!EVP_DigestUpdate(ctx.get(), inBuf.data(), inBuf.size())) {
-        ThrowError("bad md update", ERR_get_error());
+    std::noskipws(inStream);
+
+    while (!inStream.eof()) {
+        inStream.read(reinterpret_cast<std::istream::char_type *>(inBuf.data()), CHUNK_SIZE);
+
+        if (inStream.fail() && !inStream.eof()) {
+            throw std::runtime_error("Error while reading from file");
+        }
+
+        if (!EVP_DigestUpdate(ctx.get(), inBuf.data(), inStream.gcount())) {
+            ThrowError("bad md update", ERR_get_error());
+        }
     }
 
     unsigned int mdLen{};
