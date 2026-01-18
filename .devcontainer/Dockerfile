@@ -7,10 +7,26 @@ RUN apt update
 # Install common tools
 RUN apt install -y python3-minimal python3-pip pipx git less vim sudo cmake make g++-15 clang-format clangd-20
 
+#
 # Install additional tools and libraries
+#
+
+# LLVM/clang tools
+RUN apt install -y libllvm-20-ocaml-dev libllvm20 llvm-20 llvm-20-dev llvm-20-doc llvm-20-examples llvm-20-runtime
+RUN apt install -y clang-20 clang-tools-20 clang-20-doc libclang-common-20-dev libclang-20-dev libclang1-20 clang-format-20 python3-clang-20 clangd-20 clang-tidy-20
+
+# Network tools and Asio library
+RUN apt install -y net-tools libasio-dev netcat-traditional wget
+
+# Graphics tool and SFML library
+RUN apt install -y libsfml-dev gnuplot
+
+# Custom allocator library
 RUN apt install -y libjemalloc-dev
 
+#
 # Cleanup
+#
 RUN apt autoremove -y \
     && apt autoclean \
     && rm -rf /var/lib/apt/lists/* \
@@ -22,8 +38,8 @@ RUN ln -fs /usr/bin/g++-15 /usr/bin/g++
 RUN ln -fs /usr/bin/gcc-15 /usr/bin/gcc
 
 ARG USERNAME=dev
-ARG USER_UID
-ARG USER_GID
+ARG USER_UID=1000
+ARG USER_GID=1000
 
 RUN printf "\n\n\nReceived args:\n\tUSERNAME=$USERNAME\n\tUSER_UID=$USER_UID\n\tUSER_GID=$USER_GID\n"
 RUN test -n "$USER_UID" && test -n "$USER_GID" || (printf "\n\n\n\tERROR: USER_UID (equal to '$USER_UID') or USER_GID (equal to '$USER_GID') is not set!\n\n\n" && exit 1)

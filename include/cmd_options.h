@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/program_options.hpp>
+
 #include <string>
 #include <unordered_map>
 
@@ -17,12 +18,17 @@ public:
         CHECKSUM,
     };
 
-    void Parse(int argc, char *argv[]);
+    void Parse(int argc, const char *const argv[]);
 
     COMMAND_TYPE GetCommand() const { return command_; }
     std::string GetInputFile() const { return inputFile_; }
     std::string GetOutputFile() const { return outputFile_; }
     std::string GetPassword() const { return password_; }
+
+private:
+    void ParseCommand(const std::string& command);
+    void ParseInputFile(const std::string& filename);
+    void ParseOutputFile(const std::string& filename);
 
 private:
     COMMAND_TYPE command_;

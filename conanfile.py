@@ -16,7 +16,7 @@ class CryptoGuardConan(ConanFile):
         self.tool_requires("cmake/3.30.0")
     
     def layout(self):
-        basic_layout(self, src_folder=".", build_folder="build")
+        basic_layout(self, src_folder=".", build_folder="cmake-build-debug")
     
     def generate(self):
         deps = CMakeDeps(self)
